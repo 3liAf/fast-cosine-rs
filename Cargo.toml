@@ -1,0 +1,17 @@
+[package]
+name = "fast-cosine-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ali Afzal Yousuf <hello@astrameld.com>"]
+description = "Zero-dependency, high-throughput cosine similarity, dot product, and vector normalization for dense RAG embeddings."
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/3liAf/fast-cosine-rs"
+keywords = ["cosine-similarity", "embeddings", "rag", "vector-search", "simd"]
+categories = ["algorithms", "mathematics", "science"]
+
+[dependencies]
+
+[[example]]
+name = "benchmark"
+path = "examples/benchmark.rs"
