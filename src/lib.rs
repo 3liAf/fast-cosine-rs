@@ -197,6 +197,23 @@ pub fn euclidean_distance(a: &[f32], b: &[f32]) -> Result<f32, VectorError> {
     Ok(sum.sqrt())
 }
 
+/// Computes cosine similarity of `query` against each vector in `candidates`.
+///
+/// Pre-allocates the result vector and validates dimension on each candidate.
+pub fn batch_cosine_similarity<'a>(
+    query: &[f32],
+    candidates: &[&'a [f32]],
+) -> Result<Vec<f32>, VectorError> {
+    if candidates.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut results = Vec::with_capacity(candidates.len());
+    for candidate in candidates {
+        results.push(cosine_similarity(query, candidate)?);
+    }
+    Ok(results)
+}
+
 /// Ranks the candidates by cosine similarity relative to `query`, returning the top `k` indices and scores.
 ///
 /// Output is sorted in descending order of similarity (highest first).
@@ -300,6 +317,18 @@ mod tests {
         let b = [3.0, 4.0];
         let dist = euclidean_distance(&a, &b).expect("distance failed");
         assert!((dist - 5.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_batch_cosine_similarity() {
+        let query = [1.0, 0.0];
+        let c0 = [1.0, 0.0];
+        let c1 = [0.0, 1.0];
+        let candidates = [&c0[..], &c1[..]];
+        let results = batch_cosine_similarity(&query, &candidates).unwrap();
+        assert_eq!(results.len(), 2);
+        assert!((results[0] - 1.0).abs() < EPSILON);
+        assert!(results[1].abs() < EPSILON);
     }
 
     #[test]
