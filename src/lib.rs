@@ -197,6 +197,26 @@ pub fn euclidean_distance(a: &[f32], b: &[f32]) -> Result<f32, VectorError> {
     Ok(sum.sqrt())
 }
 
+/// Computes the Manhattan (L1) distance between two vectors.
+pub fn manhattan_distance(a: &[f32], b: &[f32]) -> Result<f32, VectorError> {
+    if a.is_empty() {
+        return Err(VectorError::EmptyVector);
+    }
+    if a.len() != b.len() {
+        return Err(VectorError::DimensionMismatch {
+            expected: a.len(),
+            found: b.len(),
+        });
+    }
+
+    let mut sum = 0.0f32;
+    for i in 0..a.len() {
+        sum += (a[i] - b[i]).abs();
+    }
+
+    Ok(sum)
+}
+
 /// Computes cosine similarity of `query` against each vector in `candidates`.
 ///
 /// Pre-allocates the result vector and validates dimension on each candidate.
@@ -309,6 +329,15 @@ mod tests {
 
         let norm = l2_norm(&a).expect("norm failed");
         assert!((norm - 1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_manhattan_distance() {
+        let a = [1.0, 2.0, 3.0];
+        let b = [4.0, 0.0, -1.0];
+        let dist = manhattan_distance(&a, &b).expect("manhattan failed");
+        // |1-4| + |2-0| + |3 - (-1)| = 3 + 2 + 4 = 9
+        assert!((dist - 9.0).abs() < EPSILON);
     }
 
     #[test]
